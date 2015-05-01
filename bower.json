@@ -1,0 +1,23 @@
+{
+  "name": "guestful-track",
+  "version": "0.3.0",
+  "homepage": "https://github.com/guestful/track.js",
+  "authors": [
+    "Guestful"
+  ],
+  "main": "guestful-track.js",
+  "moduleType": [
+    "globals"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    ".*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests",
+    "package.json",
+    "Gruntfile.js"
+  ]
+}
