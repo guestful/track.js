@@ -1,0 +1,10 @@
+{
+  "name": "track.js",
+  "main": "track.js",
+  "version": "0.0.0",
+  "homepage": "https://github.com/guestful/track.js",
+  "moduleType": [
+    "globals"
+  ],
+  "private": true
+}
