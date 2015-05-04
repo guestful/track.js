@@ -529,9 +529,7 @@ typeof d?c=b[d]=[]:d="mixpanel";c.people=c.people||[];c.toString=function(b){var
                         'First Authentication Platform': 'Guestful'
                     }));
                     var data = Guestful.track.buildTracking({user: user});
-                    mixpanel.track('User Login', filter(data), function () {
-                        cb();
-                    });
+                    mixpanel.track('User Login', filter(data), cb || $.noop);
                 });
             },
 
@@ -577,7 +575,9 @@ typeof d?c=b[d]=[]:d="mixpanel";c.people=c.people||[];c.toString=function(b){var
             },
 
             userEdited: function (user, cb) {
-                if(user && user.id) mixpanel.identify(user.id);
+                if(user && user.id) {
+                    mixpanel.identify(user.id);
+                }
                 mixpanel.people.set(filter({
                     '$first_name': user.firstName,
                     '$last_name': user.lastName,
@@ -613,7 +613,7 @@ typeof d?c=b[d]=[]:d="mixpanel";c.people=c.people||[];c.toString=function(b){var
                     if(user && user.id) {
                         mixpanel.identify(user.id);
                     }
-                    mixpanel.track('User Edited', filter(data), cb);
+                    mixpanel.track('User Edited', filter(data), cb || $.noop);
                 });
             },
 
@@ -651,7 +651,7 @@ typeof d?c=b[d]=[]:d="mixpanel";c.people=c.people||[];c.toString=function(b){var
             searchNotFound : function(cb) {
                 var data = Guestful.track.buildBaseTracking();
                 data['No Result'] = true;
-                mixpanel.track('Search', filter(data));
+                mixpanel.track('Search', filter(data), cb || $.noop);
             },
 
             links : function(selector, event) {
