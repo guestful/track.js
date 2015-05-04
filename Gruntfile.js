@@ -5,7 +5,7 @@ module.exports = function (grunt) {
         pkg: grunt.file.readJSON('package.json'),
 
         jshint: {
-            all: ['<%= pkg.name %>.js'],
+            all: ['track.js'],
             options: {
                 trailing: true,
                 jquery: true,
@@ -15,6 +15,7 @@ module.exports = function (grunt) {
                 plusplus: false,
                 nonew: true,
                 noempty: false,
+                sub: true,
                 noarg: true,
                 newcap: true,
                 latedef: true,
@@ -36,6 +37,24 @@ module.exports = function (grunt) {
                     mixpanel: true,
                     Pusher: true,
                     purl: true
+                }
+            }
+        },
+
+        concat: {
+            options: {
+                separator: '\n;',
+                process: function (src, filepath) {
+                    grunt.log.ok('+ ' + filepath);
+                    return src;
+                }
+            },
+            dist: {
+                files: {
+                    'guestful-track.js': [
+                        'mixpanel.js',
+                        'track.js'
+                    ]
                 }
             }
         },
@@ -72,11 +91,12 @@ module.exports = function (grunt) {
     });
 
     grunt.loadNpmTasks('grunt-bump');
+    grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-contrib-uglify');
 
     grunt.registerTask('default', ['build']);
-    grunt.registerTask('build', ['jshint', 'uglify']);
+    grunt.registerTask('build', ['jshint' , 'concat', 'uglify']);
     grunt.registerTask('release', ['build', 'bump:minor']);
 
 };
