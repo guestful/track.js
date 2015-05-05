@@ -301,6 +301,14 @@
                 })));
             },
 
+            eventMore: function(event, product, restaurant) {
+                mixpanel.track('Event Loading More', filter(Guestful.track.buildTracking({
+                    event: event,
+                    restaurant: restaurant,
+                    product: product
+                })));
+            },
+
             eventCheckoutStarted: function(event, product, restaurant) {
                 mixpanel.track('Checkout Started', filter(Guestful.track.buildTracking({
                     event: event,
@@ -652,7 +660,7 @@
 
             links : function(selector, event) {
                 mixpanel.track_links(selector, event, function(anchor) {
-                    var data = Guestful.track.buildBaseTracking;
+                    var data = Guestful.track.buildBaseTracking();
                     data['Link'] = anchor.href;
                     data['Location'] = document.location.href;
                     data['Website Language'] = this.language;

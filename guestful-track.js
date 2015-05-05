@@ -305,6 +305,14 @@ typeof d?c=b[d]=[]:d="mixpanel";c.people=c.people||[];c.toString=function(b){var
                 })));
             },
 
+            eventMore: function(event, product, restaurant) {
+                mixpanel.track('Event Loading More', filter(Guestful.track.buildTracking({
+                    event: event,
+                    restaurant: restaurant,
+                    product: product
+                })));
+            },
+
             eventCheckoutStarted: function(event, product, restaurant) {
                 mixpanel.track('Checkout Started', filter(Guestful.track.buildTracking({
                     event: event,
