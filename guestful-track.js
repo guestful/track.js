@@ -664,7 +664,7 @@ typeof d?c=b[d]=[]:d="mixpanel";c.people=c.people||[];c.toString=function(b){var
 
             links : function(selector, event) {
                 mixpanel.track_links(selector, event, function(anchor) {
-                    var data = Guestful.track.buildBaseTracking;
+                    var data = Guestful.track.buildBaseTracking();
                     data['Link'] = anchor.href;
                     data['Location'] = document.location.href;
                     data['Website Language'] = this.language;
