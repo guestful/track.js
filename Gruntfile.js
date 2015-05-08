@@ -59,6 +59,19 @@ module.exports = function (grunt) {
             }
         },
 
+        shell: {
+            prebump: {
+                command: function () {
+                    return "git commit -am 'Commit updates to guestful-track & guestful-track.min v%VERSION%'";
+                },
+                options: {
+                    stdout: true,
+                    stderr: true,
+                    failOnError: true
+                }
+            }
+        },
+
         uglify: {
             options: {
                 banner: '/*! <%= pkg.name %> <%= pkg.version %> <%= grunt.template.today("yyyy-mm-dd HH:mm:ss") %> */\n'
@@ -91,12 +104,13 @@ module.exports = function (grunt) {
     });
 
     grunt.loadNpmTasks('grunt-bump');
+    grunt.loadNpmTasks('grunt-shell');
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-contrib-uglify');
 
     grunt.registerTask('default', ['build']);
     grunt.registerTask('build', ['jshint' , 'concat', 'uglify']);
-    grunt.registerTask('release', ['build', 'bump:minor']);
+    grunt.registerTask('release', ['build', 'shell:prebump', 'bump:minor']);
 
 };
