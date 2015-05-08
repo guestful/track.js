@@ -75,7 +75,7 @@
             var collection = opts.collection || {};
             var author = opts.author || (opts.collection || {}).author || {};
             var data = $.extend(
-                Guestful.track.buildBaseTracking(eventOrigin, language),
+                buildBaseTracking(eventOrigin, language),
                 {
                     'Authentication Platform': 'Guestful',
                     'User ID': user.id,
@@ -116,7 +116,7 @@
         },
 
         buildReservationTracking = function (reservation, eventOrigin, language, opts) {
-            var data = Guestful.track.buildTracking(opts),
+            var data = buildTracking(eventOrigin, language, opts),
                 now = moment(),
                 start = moment(reservation.start).tz((reservation.restaurant || {}).timeZone);
             data['Reservation Origin'] = (reservation.origin || {}).name;
