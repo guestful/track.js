@@ -40,7 +40,100 @@ typeof d?c=b[d]=[]:d="mixpanel";c.people=c.people||[];c.toString=function(b){var
                     return 'Wix';
             }
             return str.charAt(0).toUpperCase() + str.slice(1);
+        },
+
+        identify = function(opts) {
+            if(opts) {
+                if(opts.user && opts.user.id) {
+                    mixpanel.identify(opts.user.id);
+                } else if (opts.guest && opts.guest.id) {
+                    mixpanel.identify(opts.guest.id);
+                } else if(opts.reservation && opts.reservation.id){
+                    mixpanel.identify(opts.reservation.id);
+                }
+            }
+        },
+
+        buildBaseTracking = function (eventOrigin, language) {
+            var url = purl();
+            return {
+                'Event Origin': eventOrigin,
+                'Website Language': language,
+                'Event Hour': (new Date()).getHours(),
+                'last_utm_source': url.param('utm_source') || getPlatform(url.param('origin')),
+                'last_utm_campaign': url.param('utm_campaign'),
+                'last_utm_content': url.param('utm_content'),
+                'last_utm_term': url.param('utm_term'),
+                'last_utm_medium': url.param('utm_medium')
+            };
+        },
+
+        buildTracking = function (eventOrigin, language, opts) {
+            opts = opts || {};
+            var user = opts.user || {};
+            var guest = opts.guest || {};
+            var restaurant = opts.restaurant || {};
+            var publisher = opts.publisher || {};
+            var event = opts.event || {};
+            var product = opts.product || {};
+            var collection = opts.collection || {};
+            var author = opts.author || (opts.collection || {}).author || {};
+            var data = $.extend(
+                Guestful.track.buildBaseTracking(eventOrigin, language),
+                {
+                    'Authentication Platform': 'Guestful',
+                    'User ID': user.id,
+                    'User Name': user.name,
+                    'User Email': user.email,
+                    'Guestful Event ID': event.id,
+                    'Guestful Event Alias': event.alias,
+                    'Guestful Event Name': event.name,
+                    'List ID': collection.id,
+                    'List Alias': collection.alias,
+                    'List Name': collection.name,
+                    'Author ID': author.id,
+                    'Author Alias': author.alias,
+                    'Author Name': author.name,
+                    'Product Title': product.title,
+                    'Product Time': product.time,
+                    'Product Day': product.day,
+                    'Guest ID': guest.id,
+                    'Guest Name': guest.name,
+                    'Guest Email': guest.email,
+                    'Restaurant ID': restaurant.id,
+                    'Restaurant Alias': restaurant.alias,
+                    'Restaurant Name': restaurant.name,
+                    'Restaurant Region': (restaurant.address || {}).region,
+                    'Restaurant Neighborhood': (restaurant.address || {}).neighborhood,
+                    'Restaurant City': (restaurant.address || {}).city,
+                    'Restaurant Country Code': (restaurant.address || {}).countryCode,
+                    'Restaurant State Code': (restaurant.address || {}).stateCode,
+                    'Publisher ID': publisher.id,
+                    'Publisher Alias': publisher.alias,
+                    'Publisher Name': publisher.name
+                }
+            );
+            if (guest.createdDate) {
+                data['Guest Creation Date'] = moment(guest.createdDate).utc().format(patternDT);
+            }
+            return data;
+        },
+
+        buildReservationTracking = function (reservation, eventOrigin, language, opts) {
+            var data = Guestful.track.buildTracking(opts),
+                now = moment(),
+                start = moment(reservation.start).tz((reservation.restaurant || {}).timeZone);
+            data['Reservation Origin'] = (reservation.origin || {}).name;
+            data['Reservation ID'] = reservation.id;
+            data['Party Size'] = reservation.partySize;
+            data['Reserved Date'] = start.clone().utc().format(patternDT);
+            data['Reserved Hour'] = start.hour();
+            data['Days Ahead'] = start.clone().diff(now, 'days');
+            data['Hours Ahead'] = start.clone().diff(now, 'hours');
+            data['Reservation Walkin'] = reservation.walkin;
+            return data;
         };
+
 
     window.Guestful = $.extend(window.Guestful || {}, {
         track: {
@@ -56,93 +149,10 @@ typeof d?c=b[d]=[]:d="mixpanel";c.people=c.people||[];c.toString=function(b){var
                 mixpanel.init(token);
             },
 
-            buildBaseTracking : function() {
-                var url = purl();
-                return {
-                    'Event Origin': this.eventOrigin,
-                    'Website Language' : this.language,
-                    'Event Hour': (new Date()).getHours(),
-                    'last_utm_source': url.param('utm_source') || getPlatform(url.param('origin')),
-                    'last_utm_campaign': url.param('utm_campaign'),
-                    'last_utm_content': url.param('utm_content'),
-                    'last_utm_term': url.param('utm_term'),
-                    'last_utm_medium': url.param('utm_medium')
-                };
-            },
-
-            buildTracking : function (opts) {
-                opts = opts || {};
-                var user = opts.user || {};
-                var guest = opts.guest || {};
-                var restaurant = opts.restaurant || {};
-                var publisher = opts.publisher || {};
-                var event = opts.event || {};
-                var product = opts.product || {};
-                var collection = opts.collection || {};
-                var author = opts.author || (opts.collection || {}).author || {};
-                var data = $.extend(
-                    Guestful.track.buildBaseTracking(),
-                    {
-                        'Authentication Platform': 'Guestful',
-                        'User ID': user.id,
-                        'User Name': user.name,
-                        'User Email': user.email,
-                        'Guestful Event ID': event.id,
-                        'Guestful Event Alias': event.alias,
-                        'Guestful Event Name': event.name,
-                        'List ID': collection.id,
-                        'List Alias': collection.alias,
-                        'List Name': collection.name,
-                        'Author ID': author.id,
-                        'Author Alias': author.alias,
-                        'Author Name': author.name,
-                        'Product Title' : product.title,
-                        'Product Time' : product.time,
-                        'Product Day' : product.day,
-                        'Guest ID': guest.id,
-                        'Guest Name': guest.name,
-                        'Guest Email': guest.email,
-                        'Restaurant ID': restaurant.id,
-                        'Restaurant Alias': restaurant.alias,
-                        'Restaurant Name': restaurant.name,
-                        'Restaurant Region': (restaurant.address || {}).region,
-                        'Restaurant Neighborhood': (restaurant.address || {}).neighborhood,
-                        'Restaurant City': (restaurant.address || {}).city,
-                        'Restaurant Country Code': (restaurant.address || {}).countryCode,
-                        'Restaurant State Code': (restaurant.address || {}).stateCode,
-                        'Publisher ID': publisher.id,
-                        'Publisher Alias': publisher.alias,
-                        'Publisher Name': publisher.name
-                    }
-                );
-                if(guest.createdDate) {
-                    data['Guest Creation Date'] = moment(guest.createdDate).utc().format(patternDT);
-                }
-                return data;
-            },
-
-            buildReservationTracking : function (reservation, opts) {
-                var data = Guestful.track.buildTracking(opts),
-                    now = moment(),
-                    start = moment(reservation.start).tz((reservation.restaurant || {}).timeZone);
-                data['Reservation Origin'] = (reservation.origin || {}).name;
-                data['Reservation ID'] = reservation.id;
-                data['Party Size'] = reservation.partySize;
-                data['Reserved Date'] = start.clone().utc().format(patternDT);
-                data['Reserved Hour'] = start.hour();
-                data['Days Ahead'] = start.clone().diff(now, 'days');
-                data['Hours Ahead'] = start.clone().diff(now, 'hours');
-                return data;
-            },
-
             viewOpened: function (viewName, opts) {
-                var data = Guestful.track.buildTracking(opts);
+                var data = buildTracking(this.eventOrigin, this.language, opts);
                 data['View Name'] = viewName;
-                if(opts && opts.user && opts.user.id) {
-                    mixpanel.identify(opts.user.id);
-                } else if (opts && opts.guest && opts.guest.id) {
-                    mixpanel.identify(opts.guest.id);
-                }
+                identify(opts);
                 if(opts && opts.pageLocation) {
                     data['Page Location'] = opts.pageLocation;
                 }
@@ -150,37 +160,53 @@ typeof d?c=b[d]=[]:d="mixpanel";c.people=c.people||[];c.toString=function(b){var
             },
 
             viewShared: function(viewName, service, opts) {
-                var data = Guestful.track.buildTracking(opts);
+                var data = buildTracking(this.eventOrigin, this.language, opts);
                 data['Service Name'] = service.service;
                 data['Service Url'] = service.url;
                 data['Service Title'] = service.title;
                 data['View Name'] = viewName;
+                identify(opts);
                 mixpanel.track('View Shared', filter(data));
             },
 
             error: function (errorType, viewName, eventName, opts) {
-                var data = Guestful.track.buildTracking(opts);
+                var data = buildTracking(this.eventOrigin, this.language, opts);
                 data['View Name'] = viewName;
                 data['Event Name'] = eventName;
                 data['Error Type'] = errorType;
-                if(opts && opts.user && opts.user.id) {
-                    mixpanel.identify(opts.user.id);
-                } else if (opts && opts.guest && opts.guest.id) {
-                    mixpanel.identify(opts.guest.id);
-                }
+                identify(opts);
                 mixpanel.track('Error', filter(data));
             },
 
             //Reservation
-            reservationConfirmed: function (reservation, guest, restaurant, publisher) {
-                var data = Guestful.track.buildReservationTracking(reservation, {
+            reservationCreated: function (reservation, guest, restaurant, publisher) {
+                var data = buildReservationTracking(reservation, this.eventOrigin, this.language, {
                     guest: guest,
                     restaurant: restaurant,
                     publisher: publisher
                 });
-                if (guest && guest.id) {
-                    mixpanel.identify(guest.id);
-                }
+                identify({
+                    guest: guest,
+                    reservation: reservation
+                });
+
+                mixpanel.track('Reservation Created', filter(data));
+                mixpanel.people.set({
+                    'Last Activity Date': new Date()
+                });
+            },
+
+            reservationConfirmed: function (reservation, guest, restaurant, publisher) {
+                var data = buildReservationTracking(reservation, this.eventOrigin, this.language, {
+                    guest: guest,
+                    restaurant: restaurant,
+                    publisher: publisher
+                });
+                identify({
+                    guest: guest,
+                    reservation: reservation
+                });
+
                 mixpanel.track('Reservation Confirmed', filter(data));
                 mixpanel.people.set({
                     'Last Activity Date': new Date()
@@ -188,14 +214,16 @@ typeof d?c=b[d]=[]:d="mixpanel";c.people=c.people||[];c.toString=function(b){var
             },
 
             reservationEdited: function (reservation, guest, restaurant, publisher) {
-                var data = Guestful.track.buildReservationTracking(reservation, {
+                var data = buildReservationTracking(reservation, this.eventOrigin, this.language, {
                     guest: guest,
                     restaurant: restaurant,
                     publisher: publisher
                 });
-                if (guest && guest.id) {
-                    mixpanel.identify(guest.id);
-                }
+                identify({
+                    guest: guest,
+                    reservation: reservation
+                });
+
                 mixpanel.track('Reservation Edited', filter(data));
                 mixpanel.people.set({
                     'Last Activity Date': new Date()
@@ -203,14 +231,16 @@ typeof d?c=b[d]=[]:d="mixpanel";c.people=c.people||[];c.toString=function(b){var
             },
 
             reservationCanceled: function (reservation, guest, restaurant, publisher) {
-                var data = Guestful.track.buildReservationTracking(reservation, {
+                var data = buildReservationTracking(reservation, this.eventOrigin, this.language, {
                     guest: guest,
                     restaurant: restaurant,
                     publisher: publisher
                 });
-                if (guest && guest.id) {
-                    mixpanel.identify(guest.id);
-                }
+                identify({
+                    guest: guest,
+                    reservation: reservation
+                });
+
                 mixpanel.track('Reservation Canceled', filter(data));
                 mixpanel.people.increment('Cancelation Count');
                 mixpanel.people.set({
@@ -218,17 +248,55 @@ typeof d?c=b[d]=[]:d="mixpanel";c.people=c.people||[];c.toString=function(b){var
                 });
             },
 
+            reservationCompleted: function (reservation, guest, restaurant, publisher) {
+                var data = buildReservationTracking(reservation, this.eventOrigin, this.language, {
+                    guest: guest,
+                    restaurant: restaurant,
+                    publisher: publisher
+                });
+                identify({
+                    guest: guest,
+                    reservation: reservation
+                });
+
+                mixpanel.track('Reservation Completed', filter(data));
+                mixpanel.people.set({
+                    'Last Activity Date': new Date()
+                });
+            },
+
+            reservationNoShow: function (reservation, guest, restaurant, publisher) {
+                var data = buildReservationTracking(reservation, this.eventOrigin, this.language, {
+                    guest: guest,
+                    restaurant: restaurant,
+                    publisher: publisher
+                });
+                identify({
+                    guest: guest,
+                    reservation: reservation
+                });
+
+                mixpanel.people.increment('NoShow Count');
+                mixpanel.track('Reservation NoShow', filter(data));
+                mixpanel.people.set({
+                    'Last Activity Date': new Date()
+                });
+            },
+
+
             reservationReviewed: function (scale, reservation, guest, restaurant, publisher, callback) {
-                var data = Guestful.track.buildReservationTracking(reservation, {
+                var data = buildReservationTracking(reservation, this.eventOrigin, this.language, {
                     guest: guest,
                     restaurant : restaurant,
                     publisher: publisher
                 });
 
                 data['Liked'] = scale >= 0.5;
-                if (guest && guest.id) {
-                    mixpanel.identify(guest.id);
-                }
+                identify({
+                    guest: guest,
+                    reservation: reservation
+                });
+
                 mixpanel.people.set({
                     'Last Activity Date': new Date(),
                     'Last Review Date': new Date()
@@ -240,13 +308,16 @@ typeof d?c=b[d]=[]:d="mixpanel";c.people=c.people||[];c.toString=function(b){var
                     'Reviewed Restaurant Names': restaurant.name
                 });
                 mixpanel.track('Reservation Reviewed', filter(data), callback || $.noop);
+                mixpanel.people.set({
+                    'Last Activity Date': new Date()
+                });
             },
 
             //Guest
             guestLogin: function (guest, restaurant, publisher, callback) {
-                if(guest && guest.id) {
-                    mixpanel.identify(guest.id);
-                }
+                identify({
+                    guest: guest
+                });
 
                 mixpanel.people.set(filter({
                     '$first_name': guest.firstName,
@@ -274,7 +345,7 @@ typeof d?c=b[d]=[]:d="mixpanel";c.people=c.people||[];c.toString=function(b){var
                     }));
                     (callback || $.noop)();
                 });
-                mixpanel.track('Guest Login', filter(Guestful.track.buildTracking({
+                mixpanel.track('Guest Login', filter(buildTracking(this.eventOrigin, this.language, {
                     guest: guest,
                     restaurant: restaurant,
                     publisher: publisher
@@ -282,15 +353,18 @@ typeof d?c=b[d]=[]:d="mixpanel";c.people=c.people||[];c.toString=function(b){var
             },
 
             guestSubscribed : function(guest, restaurant, pageLocation) {
-                var data = Guestful.track.buildTracking({guest: guest, restaurant: restaurant});
+                var data = buildTracking(this.eventOrigin, this.language, {guest: guest, restaurant: restaurant});
                 data['Guest Language'] = guest.lang;
                 data['Page Location'] = pageLocation;
+                identify({
+                    guest: guest
+                });
                 mixpanel.track('Guest Opt-In', filter(data));
             },
 
             //Event
             eventBooked: function(event, product, restaurant) {
-                mixpanel.track('Event Booking', filter(Guestful.track.buildTracking({
+                mixpanel.track('Event Booking', filter(buildTracking(this.eventOrigin, this.language, {
                     event: event,
                     restaurant : restaurant,
                     product: product
@@ -298,7 +372,7 @@ typeof d?c=b[d]=[]:d="mixpanel";c.people=c.people||[];c.toString=function(b){var
             },
 
             eventBack: function(event, product, restaurant) {
-                mixpanel.track('Event Booking Back', filter(Guestful.track.buildTracking({
+                mixpanel.track('Event Booking Back', filter(buildTracking(this.eventOrigin, this.language, {
                     event: event,
                     restaurant: restaurant,
                     product: product
@@ -306,7 +380,7 @@ typeof d?c=b[d]=[]:d="mixpanel";c.people=c.people||[];c.toString=function(b){var
             },
 
             eventMore: function(event, product, restaurant) {
-                mixpanel.track('Event Loading More', filter(Guestful.track.buildTracking({
+                mixpanel.track('Event Loading More', filter(buildTracking(this.eventOrigin, this.language, {
                     event: event,
                     restaurant: restaurant,
                     product: product
@@ -314,7 +388,7 @@ typeof d?c=b[d]=[]:d="mixpanel";c.people=c.people||[];c.toString=function(b){var
             },
 
             eventCheckoutStarted: function(event, product, restaurant) {
-                mixpanel.track('Checkout Started', filter(Guestful.track.buildTracking({
+                mixpanel.track('Checkout Started', filter(buildTracking(this.eventOrigin, this.language, {
                     event: event,
                     restaurant: restaurant,
                     product: product
@@ -323,7 +397,7 @@ typeof d?c=b[d]=[]:d="mixpanel";c.people=c.people||[];c.toString=function(b){var
 
             //Portal
             installedWidget : function(user, restaurant, platform, eventOrigin) {
-                var data = Guestful.track.buildTracking({
+                var data = buildTracking(this.eventOrigin, this.language, {
                     user: user,
                     restaurant: restaurant
                 });
@@ -331,90 +405,93 @@ typeof d?c=b[d]=[]:d="mixpanel";c.people=c.people||[];c.toString=function(b){var
                     data['Event Origin'] = eventOrigin;
                 }
                 data['Platform'] = platform;
+                identify({
+                    user: user
+                });
                 mixpanel.track('Widget Installed', filter(data));
             },
 
             contactAdded: function (user, callback) {
-                var data = Guestful.track.buildTracking({user: user});
-                if(user && user.id) {
-                    mixpanel.identify(user.id);
-                }
+                var data = buildTracking(this.eventOrigin, this.language, {user: user});
+                identify({
+                    user: user
+                });
                 mixpanel.track('Contact Added', filter(data), callback);
             },
 
             contactEdited: function (user, callback) {
-                var data = Guestful.track.buildTracking({user: user});
-                if(user && user.id) {
-                    mixpanel.identify(user.id);
-                }
+                var data = buildTracking(this.eventOrigin, this.language, {user: user});
+                identify({
+                    user: user
+                });
                 mixpanel.track('Contact Edited', filter(data), callback);
             },
 
             contactRemoved: function (user, callback) {
-                var data = Guestful.track.buildTracking({user: user});
-                if(user && user.id) {
-                    mixpanel.identify(user.id);
-                }
+                var data = buildTracking(this.eventOrigin, this.language, {user: user});
+                identify({
+                    user: user
+                });
                 mixpanel.track('Contact Removed', filter(data), callback);
             },
 
             serviceAdded: function (user, service, callback) {
-                var data = Guestful.track.buildTracking({user: user});
+                var data = buildTracking(this.eventOrigin, this.language, {user: user});
                 data['Days'] = service.recurrence.daysOfWeek;
-                if(user && user.id) {
-                    mixpanel.identify(user.id);
-                }
+                identify({
+                    user: user
+                });
                 mixpanel.track('Service Added', filter(data), callback);
             },
 
             serviceEdited: function (user, service, callback) {
-                var data = Guestful.track.buildTracking({user: user});
+                var data = buildTracking(this.eventOrigin, this.language, {user: user});
                 data['Days'] = service.recurrence.daysOfWeek;
-                if(user && user.id) {
-                    mixpanel.identify(user.id);
-                }
+                identify({
+                    user: user
+                });
                 mixpanel.track('Service Edited', filter(data), callback);
             },
 
             serviceRemoved: function (user, callback) {
-                var data = Guestful.track.buildTracking({user: user});
-                if(user && user.id) {
-                    mixpanel.identify(user.id);
-                }
+                var data = buildTracking(this.eventOrigin, this.language, {user: user});
+                identify({
+                    user: user
+                });
                 mixpanel.track('Service Removed', filter(data), callback);
             },
 
             noteAdded: function (user, note, callback) {
-                var data = Guestful.track.buildTracking({user: user});
+                var data = buildTracking(this.eventOrigin, this.language, {user: user});
                 data['Days'] = note.recurrence.daysOfWeek;
-                if(user && user.id) {
-                    mixpanel.identify(user.id);
-                }
+                identify({
+                    user: user
+                });
                 mixpanel.track('Note Added', filter(data), callback);
             },
 
             noteEdited: function (user, note, callback) {
-                var data = Guestful.track.buildTracking({user: user});
+                var data = buildTracking(this.eventOrigin, this.language, {user: user});
                 data['Days'] = note.recurrence.daysOfWeek;
-                if(user && user.id) {
-                    mixpanel.identify(user.id);
-                }
+                identify({
+                    user: user
+                });
                 mixpanel.track('Note Edited', filter(data), callback);
             },
 
             noteRemoved: function (user, callback) {
-                var data = Guestful.track.buildTracking({user: user});
-                if(user && user.id) {
-                    mixpanel.identify(user.id);
-                }
+                var data = buildTracking(this.eventOrigin, this.language, {user: user});
+                identify({
+                    user: user
+                });
                 mixpanel.track('Note Removed', filter(data), callback);
             },
 
             //Restaurant
             restaurantCreated: function (user, restaurant, callback) {
-                if(user && user.id) {
-                    mixpanel.identify(user.id);
-                }
+                identify({
+                    user: user
+                });
                 mixpanel.people.set(filter({
                     'Roles': getRoles(user),
                     'Staffed Restaurant Aliases': $.map(user.restaurants || [], function (r) {
@@ -436,7 +513,7 @@ typeof d?c=b[d]=[]:d="mixpanel";c.people=c.people||[];c.toString=function(b){var
                         return r.name;
                     })
                 }), function() {
-                    mixpanel.track('Restaurant Created', filter(Guestful.track.buildTracking({
+                    mixpanel.track('Restaurant Created', filter(buildTracking(this.eventOrigin, this.language, {
                         user: user,
                         restaurant: restaurant
                     })), callback);
@@ -444,24 +521,24 @@ typeof d?c=b[d]=[]:d="mixpanel";c.people=c.people||[];c.toString=function(b){var
             },
 
             restaurantEdited: function (user, restaurant, callback) {
-                var data = Guestful.track.buildTracking({user: user, restaurant: restaurant});
-                if(user && user.id) {
-                    mixpanel.identify(user.id);
-                }
+                var data = buildTracking(this.eventOrigin, this.language, {user: user, restaurant: restaurant});
+                identify({
+                    user: user
+                });
                 mixpanel.track('Restaurant Edited', filter(data), callback);
             },
 
             //User
             passwordResetRequested: function (email) {
-                var data = Guestful.track.buildTracking();
+                var data = buildTracking(this.eventOrigin, this.language);
                 data['User Email'] = email;
                 mixpanel.track('Password Reset Requested', filter(data));
             },
 
             userLoaded: function(user) {
-                if(user && user.id) {
-                    mixpanel.identify(user.id);
-                }
+                identify({
+                    user: user
+                });
                 mixpanel.people.set(filter({
                     '$first_name': user.firstName,
                     '$last_name': user.lastName,
@@ -497,9 +574,9 @@ typeof d?c=b[d]=[]:d="mixpanel";c.people=c.people||[];c.toString=function(b){var
             },
 
             userLogged: function (user, cb) {
-                if(user && user.id) {
-                    mixpanel.identify(user.id);
-                }
+                identify({
+                    user: user
+                });
                 mixpanel.people.set(filter({
                     '$first_name': user.firstName,
                     '$last_name': user.lastName,
@@ -536,16 +613,16 @@ typeof d?c=b[d]=[]:d="mixpanel";c.people=c.people||[];c.toString=function(b){var
                         'First Authentication Date': new Date(),
                         'First Authentication Platform': 'Guestful'
                     }));
-                    var data = Guestful.track.buildTracking({user: user});
+                    var data = buildTracking(this.eventOrigin, this.language, {user: user});
                     mixpanel.track('User Login', filter(data), cb || $.noop);
                 });
             },
 
             userRegistered: function (user) {
                 // just identify the user for following events
-                if(user && user.id) {
-                    mixpanel.identify(user.id);
-                }
+                identify({
+                    user: user
+                });
                 mixpanel.people.set(filter({
                     '$first_name': user.firstName,
                     '$last_name': user.lastName,
@@ -578,14 +655,14 @@ typeof d?c=b[d]=[]:d="mixpanel";c.people=c.people||[];c.toString=function(b){var
                         return r.name;
                     })
                 }));
-                var data = Guestful.track.buildTracking({user : user});
+                var data = buildTracking(this.eventOrigin, this.language, {user : user});
                 mixpanel.track('User Registered', filter(data));
             },
 
             userEdited: function (user, cb) {
-                if(user && user.id) {
-                    mixpanel.identify(user.id);
-                }
+                identify({
+                    user: user
+                });
                 mixpanel.people.set(filter({
                     '$first_name': user.firstName,
                     '$last_name': user.lastName,
@@ -617,10 +694,7 @@ typeof d?c=b[d]=[]:d="mixpanel";c.people=c.people||[];c.toString=function(b){var
                     }),
                     'Time Zone': user.timeZone
                 }), function() {
-                    var data = Guestful.track.buildTracking({user: user});
-                    if(user && user.id) {
-                        mixpanel.identify(user.id);
-                    }
+                    var data = buildTracking(this.eventOrigin, this.language, {user: user});
                     mixpanel.track('User Edited', filter(data), cb || $.noop);
                 });
             },
@@ -651,20 +725,20 @@ typeof d?c=b[d]=[]:d="mixpanel";c.people=c.people||[];c.toString=function(b){var
                             'No Result': !data.name,
                             'Term': val
                         },
-                        Guestful.track.buildBaseTracking(),
+                        buildBaseTracking(this.eventOrigin, this.language),
                         obj[data.type] || {}
                     ), cb || $.noop));
             },
 
             searchNotFound : function(cb) {
-                var data = Guestful.track.buildBaseTracking();
+                var data = buildBaseTracking(this.eventOrigin, this.language);
                 data['No Result'] = true;
                 mixpanel.track('Search', filter(data), cb || $.noop);
             },
 
             links : function(selector, event) {
                 mixpanel.track_links(selector, event, function(anchor) {
-                    var data = Guestful.track.buildBaseTracking();
+                    var data = buildBaseTracking(this.eventOrigin, this.language);
                     data['Link'] = anchor.href;
                     data['Location'] = document.location.href;
                     data['Website Language'] = this.language;
