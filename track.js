@@ -140,13 +140,13 @@
             init: function (token, opts) {
                 opts = opts || {};
                 this.eventOrigin = opts.eventOrigin;
-                this.language = opts.language || this.language;
+                this.language = opts.language || Guestful.track.language;
 
                 mixpanel.init(token);
             },
 
             viewOpened: function (viewName, opts) {
-                var data = buildTracking(this.eventOrigin, this.language, opts);
+                var data = buildTracking(Guestful.track.eventOrigin, Guestful.track.language, opts);
                 data['View Name'] = viewName;
                 identify(opts);
                 if(opts && opts.pageLocation) {
@@ -156,7 +156,7 @@
             },
 
             viewShared: function(viewName, service, opts) {
-                var data = buildTracking(this.eventOrigin, this.language, opts);
+                var data = buildTracking(Guestful.track.eventOrigin, Guestful.track.language, opts);
                 data['Service Name'] = service.service;
                 data['Service Url'] = service.url;
                 data['Service Title'] = service.title;
@@ -166,7 +166,7 @@
             },
 
             error: function (errorType, viewName, eventName, opts) {
-                var data = buildTracking(this.eventOrigin, this.language, opts);
+                var data = buildTracking(Guestful.track.eventOrigin, Guestful.track.language, opts);
                 data['View Name'] = viewName;
                 data['Event Name'] = eventName;
                 data['Error Type'] = errorType;
@@ -176,7 +176,7 @@
 
             //Reservation
             reservationCreated: function (reservation, guest, restaurant, publisher) {
-                var data = buildReservationTracking(reservation, this.eventOrigin, this.language, {
+                var data = buildReservationTracking(reservation, Guestful.track.eventOrigin, Guestful.track.language, {
                     guest: guest,
                     restaurant: restaurant,
                     publisher: publisher
@@ -193,7 +193,7 @@
             },
 
             reservationConfirmed: function (reservation, guest, restaurant, publisher) {
-                var data = buildReservationTracking(reservation, this.eventOrigin, this.language, {
+                var data = buildReservationTracking(reservation, Guestful.track.eventOrigin, Guestful.track.language, {
                     guest: guest,
                     restaurant: restaurant,
                     publisher: publisher
@@ -210,7 +210,7 @@
             },
 
             reservationEdited: function (reservation, guest, restaurant, publisher) {
-                var data = buildReservationTracking(reservation, this.eventOrigin, this.language, {
+                var data = buildReservationTracking(reservation, Guestful.track.eventOrigin, Guestful.track.language, {
                     guest: guest,
                     restaurant: restaurant,
                     publisher: publisher
@@ -227,7 +227,7 @@
             },
 
             reservationCanceled: function (reservation, guest, restaurant, publisher) {
-                var data = buildReservationTracking(reservation, this.eventOrigin, this.language, {
+                var data = buildReservationTracking(reservation, Guestful.track.eventOrigin, Guestful.track.language, {
                     guest: guest,
                     restaurant: restaurant,
                     publisher: publisher
@@ -245,7 +245,7 @@
             },
 
             reservationCompleted: function (reservation, guest, restaurant, publisher) {
-                var data = buildReservationTracking(reservation, this.eventOrigin, this.language, {
+                var data = buildReservationTracking(reservation, Guestful.track.eventOrigin, Guestful.track.language, {
                     guest: guest,
                     restaurant: restaurant,
                     publisher: publisher
@@ -262,7 +262,7 @@
             },
 
             reservationNoShow: function (reservation, guest, restaurant, publisher) {
-                var data = buildReservationTracking(reservation, this.eventOrigin, this.language, {
+                var data = buildReservationTracking(reservation, Guestful.track.eventOrigin, Guestful.track.language, {
                     guest: guest,
                     restaurant: restaurant,
                     publisher: publisher
@@ -281,7 +281,7 @@
 
 
             reservationReviewed: function (scale, reservation, guest, restaurant, publisher, callback) {
-                var data = buildReservationTracking(reservation, this.eventOrigin, this.language, {
+                var data = buildReservationTracking(reservation, Guestful.track.eventOrigin, Guestful.track.language, {
                     guest: guest,
                     restaurant : restaurant,
                     publisher: publisher
@@ -341,7 +341,7 @@
                     }));
                     (callback || $.noop)();
                 });
-                mixpanel.track('Guest Login', filter(buildTracking(this.eventOrigin, this.language, {
+                mixpanel.track('Guest Login', filter(buildTracking(Guestful.track.eventOrigin, Guestful.track.language, {
                     guest: guest,
                     restaurant: restaurant,
                     publisher: publisher
@@ -349,7 +349,7 @@
             },
 
             guestSubscribed : function(guest, restaurant, pageLocation) {
-                var data = buildTracking(this.eventOrigin, this.language, {guest: guest, restaurant: restaurant});
+                var data = buildTracking(Guestful.track.eventOrigin, Guestful.track.language, {guest: guest, restaurant: restaurant});
                 data['Guest Language'] = guest.lang;
                 data['Page Location'] = pageLocation;
                 identify({
@@ -360,7 +360,7 @@
 
             //Event
             eventBooked: function(event, product, restaurant) {
-                mixpanel.track('Event Booking', filter(buildTracking(this.eventOrigin, this.language, {
+                mixpanel.track('Event Booking', filter(buildTracking(Guestful.track.eventOrigin, Guestful.track.language, {
                     event: event,
                     restaurant : restaurant,
                     product: product
@@ -368,7 +368,7 @@
             },
 
             eventBack: function(event, product, restaurant) {
-                mixpanel.track('Event Booking Back', filter(buildTracking(this.eventOrigin, this.language, {
+                mixpanel.track('Event Booking Back', filter(buildTracking(Guestful.track.eventOrigin, Guestful.track.language, {
                     event: event,
                     restaurant: restaurant,
                     product: product
@@ -376,7 +376,7 @@
             },
 
             eventMore: function(event, product, restaurant) {
-                mixpanel.track('Event Loading More', filter(buildTracking(this.eventOrigin, this.language, {
+                mixpanel.track('Event Loading More', filter(buildTracking(Guestful.track.eventOrigin, Guestful.track.language, {
                     event: event,
                     restaurant: restaurant,
                     product: product
@@ -384,7 +384,7 @@
             },
 
             eventCheckoutStarted: function(event, product, restaurant) {
-                mixpanel.track('Checkout Started', filter(buildTracking(this.eventOrigin, this.language, {
+                mixpanel.track('Checkout Started', filter(buildTracking(Guestful.track.eventOrigin, Guestful.track.language, {
                     event: event,
                     restaurant: restaurant,
                     product: product
@@ -393,7 +393,7 @@
 
             //Portal
             installedWidget : function(user, restaurant, platform, eventOrigin) {
-                var data = buildTracking(this.eventOrigin, this.language, {
+                var data = buildTracking(Guestful.track.eventOrigin, Guestful.track.language, {
                     user: user,
                     restaurant: restaurant
                 });
@@ -408,7 +408,7 @@
             },
 
             contactAdded: function (user, callback) {
-                var data = buildTracking(this.eventOrigin, this.language, {user: user});
+                var data = buildTracking(Guestful.track.eventOrigin, Guestful.track.language, {user: user});
                 identify({
                     user: user
                 });
@@ -416,7 +416,7 @@
             },
 
             contactEdited: function (user, callback) {
-                var data = buildTracking(this.eventOrigin, this.language, {user: user});
+                var data = buildTracking(Guestful.track.eventOrigin, Guestful.track.language, {user: user});
                 identify({
                     user: user
                 });
@@ -424,7 +424,7 @@
             },
 
             contactRemoved: function (user, callback) {
-                var data = buildTracking(this.eventOrigin, this.language, {user: user});
+                var data = buildTracking(Guestful.track.eventOrigin, Guestful.track.language, {user: user});
                 identify({
                     user: user
                 });
@@ -432,7 +432,7 @@
             },
 
             serviceAdded: function (user, service, callback) {
-                var data = buildTracking(this.eventOrigin, this.language, {user: user});
+                var data = buildTracking(Guestful.track.eventOrigin, Guestful.track.language, {user: user});
                 data['Days'] = service.recurrence.daysOfWeek;
                 identify({
                     user: user
@@ -441,7 +441,7 @@
             },
 
             serviceEdited: function (user, service, callback) {
-                var data = buildTracking(this.eventOrigin, this.language, {user: user});
+                var data = buildTracking(Guestful.track.eventOrigin, Guestful.track.language, {user: user});
                 data['Days'] = service.recurrence.daysOfWeek;
                 identify({
                     user: user
@@ -450,7 +450,7 @@
             },
 
             serviceRemoved: function (user, callback) {
-                var data = buildTracking(this.eventOrigin, this.language, {user: user});
+                var data = buildTracking(Guestful.track.eventOrigin, Guestful.track.language, {user: user});
                 identify({
                     user: user
                 });
@@ -458,7 +458,7 @@
             },
 
             noteAdded: function (user, note, callback) {
-                var data = buildTracking(this.eventOrigin, this.language, {user: user});
+                var data = buildTracking(Guestful.track.eventOrigin, Guestful.track.language, {user: user});
                 data['Days'] = note.recurrence.daysOfWeek;
                 identify({
                     user: user
@@ -467,7 +467,7 @@
             },
 
             noteEdited: function (user, note, callback) {
-                var data = buildTracking(this.eventOrigin, this.language, {user: user});
+                var data = buildTracking(Guestful.track.eventOrigin, Guestful.track.language, {user: user});
                 data['Days'] = note.recurrence.daysOfWeek;
                 identify({
                     user: user
@@ -476,7 +476,7 @@
             },
 
             noteRemoved: function (user, callback) {
-                var data = buildTracking(this.eventOrigin, this.language, {user: user});
+                var data = buildTracking(Guestful.track.eventOrigin, Guestful.track.language, {user: user});
                 identify({
                     user: user
                 });
@@ -509,7 +509,7 @@
                         return r.name;
                     })
                 }), function() {
-                    mixpanel.track('Restaurant Created', filter(buildTracking(this.eventOrigin, this.language, {
+                    mixpanel.track('Restaurant Created', filter(buildTracking(Guestful.track.eventOrigin, Guestful.track.language, {
                         user: user,
                         restaurant: restaurant
                     })), callback);
@@ -517,7 +517,7 @@
             },
 
             restaurantEdited: function (user, restaurant, callback) {
-                var data = buildTracking(this.eventOrigin, this.language, {user: user, restaurant: restaurant});
+                var data = buildTracking(Guestful.track.eventOrigin, Guestful.track.language, {user: user, restaurant: restaurant});
                 identify({
                     user: user
                 });
@@ -526,7 +526,7 @@
 
             //User
             passwordResetRequested: function (email) {
-                var data = buildTracking(this.eventOrigin, this.language);
+                var data = buildTracking(Guestful.track.eventOrigin, Guestful.track.language);
                 data['User Email'] = email;
                 mixpanel.track('Password Reset Requested', filter(data));
             },
@@ -609,7 +609,7 @@
                         'First Authentication Date': new Date(),
                         'First Authentication Platform': 'Guestful'
                     }));
-                    var data = buildTracking(this.eventOrigin, this.language, {user: user});
+                    var data = buildTracking(Guestful.track.eventOrigin, Guestful.track.language, {user: user});
                     mixpanel.track('User Login', filter(data), cb || $.noop);
                 });
             },
@@ -651,7 +651,7 @@
                         return r.name;
                     })
                 }));
-                var data = buildTracking(this.eventOrigin, this.language, {user : user});
+                var data = buildTracking(Guestful.track.eventOrigin, Guestful.track.language, {user : user});
                 mixpanel.track('User Registered', filter(data));
             },
 
@@ -690,7 +690,7 @@
                     }),
                     'Time Zone': user.timeZone
                 }), function() {
-                    var data = buildTracking(this.eventOrigin, this.language, {user: user});
+                    var data = buildTracking(Guestful.track.eventOrigin, Guestful.track.language, {user: user});
                     mixpanel.track('User Edited', filter(data), cb || $.noop);
                 });
             },
@@ -721,23 +721,23 @@
                             'No Result': !data.name,
                             'Term': val
                         },
-                        buildBaseTracking(this.eventOrigin, this.language),
+                        buildBaseTracking(Guestful.track.eventOrigin, Guestful.track.language),
                         obj[data.type] || {}
                     ), cb || $.noop));
             },
 
             searchNotFound : function(cb) {
-                var data = buildBaseTracking(this.eventOrigin, this.language);
+                var data = buildBaseTracking(Guestful.track.eventOrigin, Guestful.track.language);
                 data['No Result'] = true;
                 mixpanel.track('Search', filter(data), cb || $.noop);
             },
 
             links : function(selector, event) {
                 mixpanel.track_links(selector, event, function(anchor) {
-                    var data = buildBaseTracking(this.eventOrigin, this.language);
+                    var data = buildBaseTracking(Guestful.track.eventOrigin, Guestful.track.language);
                     data['Link'] = anchor.href;
                     data['Location'] = document.location.href;
-                    data['Website Language'] = this.language;
+                    data['Website Language'] = Guestful.track.language;
                     return filter(data);
                 });
             }
