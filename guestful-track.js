@@ -120,9 +120,11 @@ typeof d?c=b[d]=[]:d="mixpanel";c.people=c.people||[];c.toString=function(b){var
         },
 
         buildReservationTracking = function (reservation, eventOrigin, language, opts) {
+            opts = opts || {};
             var data = buildTracking(eventOrigin, language, opts),
                 now = moment(),
-                start = moment(reservation.start).tz((reservation.restaurant || {}).timeZone);
+                restaurant = reservation.restaurant || opts.restaurant || {},
+                start = moment(reservation.start).tz((restaurant|| {}).timeZone);
             data['Reservation Origin'] = (reservation.origin || {}).name;
             data['Reservation ID'] = reservation.id;
             data['Party Size'] = reservation.partySize;
