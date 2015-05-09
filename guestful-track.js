@@ -123,7 +123,8 @@ typeof d?c=b[d]=[]:d="mixpanel";c.people=c.people||[];c.toString=function(b){var
             opts = opts || {};
             var data = buildTracking(eventOrigin, language, opts),
                 now = moment(),
-                restaurant = reservation.restaurant || opts.restaurant || {},
+                restaurant =  opts.restaurant || reservation.restaurant || {},
+                guest = opts.guest || {},
                 start = moment(reservation.start).tz((restaurant|| {}).timeZone);
             data['Reservation Origin'] = (reservation.origin || {}).name;
             data['Reservation ID'] = reservation.id;
