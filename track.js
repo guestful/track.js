@@ -735,6 +735,12 @@
                 mixpanel.track('Search', filter(data), cb || $.noop);
             },
 
+            voted : function(guest, platform) {
+                var data = Guestful.track.buildTracking({guest: guest});
+                data['Platform'] = platform;
+                mixpanel.track('Vote', filter(data));
+            },
+
             links : function(selector, event) {
                 mixpanel.track_links(selector, event, function(anchor) {
                     var data = buildBaseTracking(Guestful.track.eventOrigin, Guestful.track.language);
