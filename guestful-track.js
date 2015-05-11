@@ -740,7 +740,7 @@ typeof d?c=b[d]=[]:d="mixpanel";c.people=c.people||[];c.toString=function(b){var
             },
 
             voted : function(guest, platform) {
-                var data = Guestful.track.buildTracking({guest: guest});
+                var data = buildTracking({guest: guest});
                 data['Platform'] = platform;
                 mixpanel.track('Vote', filter(data));
             },
