@@ -714,7 +714,6 @@
                     collection: {
                         'List ID': data.id,
                         'List Alias': data.alias,
-                        'List Alias': data.alias,
                         'List Name': data.name
                     }
                 };
