@@ -418,7 +418,7 @@ typeof d?c=b[d]=[]:d="mixpanel";c.people=c.people||[];c.toString=function(b){var
                 identify({
                     user: user
                 });
-                mixpanel.track('Contact Added', filter(data), callback);
+                mixpanel.track('Contact Added', filter(data), callback || $.noop);
             },
 
             contactEdited: function (user, callback) {
@@ -426,7 +426,7 @@ typeof d?c=b[d]=[]:d="mixpanel";c.people=c.people||[];c.toString=function(b){var
                 identify({
                     user: user
                 });
-                mixpanel.track('Contact Edited', filter(data), callback);
+                mixpanel.track('Contact Edited', filter(data), callback || $.noop);
             },
 
             contactRemoved: function (user, callback) {
@@ -434,7 +434,7 @@ typeof d?c=b[d]=[]:d="mixpanel";c.people=c.people||[];c.toString=function(b){var
                 identify({
                     user: user
                 });
-                mixpanel.track('Contact Removed', filter(data), callback);
+                mixpanel.track('Contact Removed', filter(data), callback || $.noop);
             },
 
             serviceAdded: function (user, service, callback) {
@@ -443,7 +443,7 @@ typeof d?c=b[d]=[]:d="mixpanel";c.people=c.people||[];c.toString=function(b){var
                 identify({
                     user: user
                 });
-                mixpanel.track('Service Added', filter(data), callback);
+                mixpanel.track('Service Added', filter(data), callback || $.noop);
             },
 
             serviceEdited: function (user, service, callback) {
@@ -452,7 +452,7 @@ typeof d?c=b[d]=[]:d="mixpanel";c.people=c.people||[];c.toString=function(b){var
                 identify({
                     user: user
                 });
-                mixpanel.track('Service Edited', filter(data), callback);
+                mixpanel.track('Service Edited', filter(data), callback || $.noop);
             },
 
             serviceRemoved: function (user, callback) {
@@ -460,7 +460,7 @@ typeof d?c=b[d]=[]:d="mixpanel";c.people=c.people||[];c.toString=function(b){var
                 identify({
                     user: user
                 });
-                mixpanel.track('Service Removed', filter(data), callback);
+                mixpanel.track('Service Removed', filter(data), callback || $.noop);
             },
 
             noteAdded: function (user, note, callback) {
@@ -469,7 +469,7 @@ typeof d?c=b[d]=[]:d="mixpanel";c.people=c.people||[];c.toString=function(b){var
                 identify({
                     user: user
                 });
-                mixpanel.track('Note Added', filter(data), callback);
+                mixpanel.track('Note Added', filter(data), callback || $.noop);
             },
 
             noteEdited: function (user, note, callback) {
@@ -478,7 +478,7 @@ typeof d?c=b[d]=[]:d="mixpanel";c.people=c.people||[];c.toString=function(b){var
                 identify({
                     user: user
                 });
-                mixpanel.track('Note Edited', filter(data), callback);
+                mixpanel.track('Note Edited', filter(data), callback || $.noop);
             },
 
             noteRemoved: function (user, callback) {
@@ -486,7 +486,7 @@ typeof d?c=b[d]=[]:d="mixpanel";c.people=c.people||[];c.toString=function(b){var
                 identify({
                     user: user
                 });
-                mixpanel.track('Note Removed', filter(data), callback);
+                mixpanel.track('Note Removed', filter(data), callback || $.noop);
             },
 
             //Restaurant
@@ -518,7 +518,7 @@ typeof d?c=b[d]=[]:d="mixpanel";c.people=c.people||[];c.toString=function(b){var
                     mixpanel.track('Restaurant Created', filter(buildTracking(Guestful.track.eventOrigin, Guestful.track.language, {
                         user: user,
                         restaurant: restaurant
-                    })), callback);
+                    })), callback || $.noop);
                 });
             },
 
@@ -527,7 +527,7 @@ typeof d?c=b[d]=[]:d="mixpanel";c.people=c.people||[];c.toString=function(b){var
                 identify({
                     user: user
                 });
-                mixpanel.track('Restaurant Edited', filter(data), callback);
+                mixpanel.track('Restaurant Edited', filter(data), callback || $.noop);
             },
 
             //User
