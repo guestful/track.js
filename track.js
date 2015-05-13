@@ -378,11 +378,10 @@
                 })));
             },
 
-            eventMore: function(event, product, restaurant) {
+            showMoreProducts: function(event, restaurant) {
                 mixpanel.track('Event Loading More', filter(buildTracking(Guestful.track.eventOrigin, Guestful.track.language, {
                     event: event,
-                    restaurant: restaurant,
-                    product: product
+                    restaurant: restaurant
                 })));
             },
 
@@ -733,6 +732,12 @@
                 var data = buildBaseTracking(Guestful.track.eventOrigin, Guestful.track.language);
                 data['No Result'] = true;
                 mixpanel.track('Search', filter(data), cb || $.noop);
+            },
+
+            voted : function(guest, platform) {
+                var data = buildTracking(Guestful.track.eventOrigin, Guestful.track.language, {guest: guest});
+                data['Platform'] = platform;
+                mixpanel.track('Vote', filter(data));
             },
 
             links : function(selector, event) {
