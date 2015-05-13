@@ -382,11 +382,10 @@ typeof d?c=b[d]=[]:d="mixpanel";c.people=c.people||[];c.toString=function(b){var
                 })));
             },
 
-            eventMore: function(event, product, restaurant) {
+            showMoreProducts: function(event, restaurant) {
                 mixpanel.track('Event Loading More', filter(buildTracking(Guestful.track.eventOrigin, Guestful.track.language, {
                     event: event,
-                    restaurant: restaurant,
-                    product: product
+                    restaurant: restaurant
                 })));
             },
 
