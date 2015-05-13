@@ -409,24 +409,24 @@
                 mixpanel.track('Widget Installed', filter(data));
             },
 
-            contactAdded: function (user, callback) {
-                var data = buildTracking(Guestful.track.eventOrigin, Guestful.track.language, {user: user});
+            contactAdded: function (user, restaurant, callback) {
+                var data = buildTracking(Guestful.track.eventOrigin, Guestful.track.language, {user: user, restaurant: restaurant});
                 identify({
                     user: user
                 });
                 mixpanel.track('Contact Added', filter(data), callback || $.noop);
             },
 
-            contactEdited: function (user, callback) {
-                var data = buildTracking(Guestful.track.eventOrigin, Guestful.track.language, {user: user});
+            contactEdited: function (user, restaurant, callback) {
+                var data = buildTracking(Guestful.track.eventOrigin, Guestful.track.language, {user: user, restaurant: restaurant});
                 identify({
                     user: user
                 });
                 mixpanel.track('Contact Edited', filter(data), callback || $.noop);
             },
 
-            contactRemoved: function (user, callback) {
-                var data = buildTracking(Guestful.track.eventOrigin, Guestful.track.language, {user: user});
+            contactRemoved: function (user, restaurant, callback) {
+                var data = buildTracking(Guestful.track.eventOrigin, Guestful.track.language, {user: user, restaurant: restaurant});
                 identify({
                     user: user
                 });
