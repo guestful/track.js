@@ -378,11 +378,10 @@
                 })));
             },
 
-            eventMore: function(event, product, restaurant) {
+            showMoreProducts: function(event, restaurant) {
                 mixpanel.track('Event Loading More', filter(buildTracking(Guestful.track.eventOrigin, Guestful.track.language, {
                     event: event,
-                    restaurant: restaurant,
-                    product: product
+                    restaurant: restaurant
                 })));
             },
 
@@ -714,6 +713,7 @@
                     },
                     collection: {
                         'List ID': data.id,
+                        'List Alias': data.alias,
                         'List Alias': data.alias,
                         'List Name': data.name
                     }
