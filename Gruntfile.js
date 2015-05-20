@@ -62,7 +62,7 @@ module.exports = function (grunt) {
         shell: {
             prebump: {
                 command: function () {
-                    return "git commit -am 'Commit updates to guestful-track & guestful-track.min v%VERSION%'";
+                    return "git commit -am 'Commit updates to guestful-track & guestful-track.min'";
                 },
                 options: {
                     stdout: true,
