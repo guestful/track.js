@@ -311,13 +311,18 @@ typeof d?c=b[d]=[]:d="mixpanel";c.people=c.people||[];c.toString=function(b){var
                     'Reviewed Restaurant Names': restaurant.name
                 });
                 mixpanel.track('Reservation Reviewed', filter(data), callback || $.noop);
-                mixpanel.people.set({
-                    'Last Activity Date': new Date()
-                });
             },
 
             //Guest
-            guestLogin: function (guest, restaurant, publisher, callback) {
+            // NOTE: if guest is falsy, the method returns immediately.
+            guestLogin: function (guest, opts, callback) {
+                if(!guest) {
+                    return (callback|| $.noop)();
+                }
+
+                opts = opts || {};
+                var restaurant = opts.restaurant || {},
+                    publisher = opts.publisher || {};
                 identify({
                     guest: guest
                 });
@@ -346,13 +351,39 @@ typeof d?c=b[d]=[]:d="mixpanel";c.people=c.people||[];c.toString=function(b){var
                         'First Authentication Date': new Date(),
                         'First Authentication Platform': guest.facebookAuth ? 'Facebook' : 'Guestful'
                     }));
+                    mixpanel.track('Guest Login', filter(buildTracking(Guestful.track.eventOrigin, Guestful.track.language, {
+                        guest: guest,
+                        restaurant: restaurant,
+                        publisher: publisher
+                    })));
+                    mixpanel.people.set({
+                        'Last Activity Date': new Date()
+                    });
                     (callback || $.noop)();
                 });
-                mixpanel.track('Guest Login', filter(buildTracking(Guestful.track.eventOrigin, Guestful.track.language, {
-                    guest: guest,
-                    restaurant: restaurant,
-                    publisher: publisher
-                })));
+            },
+
+            guestLogout: function(guest, opts) {
+                if(!guest) {
+                    return;
+                }
+
+                opts = opts || {};
+                var restaurant = opts.restaurant || {},
+                    publisher = opts.publisher || {},
+                    data = buildTracking(Guestful.track.eventOrigin, Guestful.track.language, {
+                        guest: guest,
+                        restaurant : restaurant,
+                        publisher : publisher
+                    });
+
+                identify({
+                    guest: guest
+                });
+                mixpanel.track('Guest Logout', filter(data));
+                mixpanel.people.set({
+                    'Last Activity Date': new Date()
+                });
             },
 
             guestSubscribed : function(guest, restaurant, pageLocation) {
