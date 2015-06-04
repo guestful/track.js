@@ -392,35 +392,50 @@
                 mixpanel.track('Guest Opt-In', filter(data));
             },
 
+            guestEdited: function(guest, opts, callback) {
+                identify({
+                    guest: guest
+                });
+                mixpanel.track('Guest Edited', filter(buildTracking(Guestful.track.eventOrigin, Guestful.track.language, {guest: guest})));
+                mixpanel.people.set({
+                    'Last Activity Date': new Date()
+                });
+                (callback || $.noop) ();
+            },
+
             //Event
-            eventBooked: function(event, product, restaurant) {
+            eventBooked: function(event, product, restaurant, opts) {
                 mixpanel.track('Event Booking', filter(buildTracking(Guestful.track.eventOrigin, Guestful.track.language, {
                     event: event,
                     restaurant : restaurant,
-                    product: product
+                    product: product,
+                    guest: opts.guest || {}
                 })));
             },
 
-            eventBack: function(event, product, restaurant) {
+            eventBack: function(event, product, restaurant, opts) {
                 mixpanel.track('Event Booking Back', filter(buildTracking(Guestful.track.eventOrigin, Guestful.track.language, {
                     event: event,
                     restaurant: restaurant,
-                    product: product
+                    product: product,
+                    guest: opts.guest || {}
                 })));
             },
 
-            showMoreProducts: function(event, restaurant) {
+            showMoreProducts: function(event, restaurant, opts) {
                 mixpanel.track('Event Loading More', filter(buildTracking(Guestful.track.eventOrigin, Guestful.track.language, {
                     event: event,
-                    restaurant: restaurant
+                    restaurant: restaurant,
+                    guest: opts.guest || {}
                 })));
             },
 
-            eventCheckoutStarted: function(event, product, restaurant) {
+            eventCheckoutStarted: function(event, product, restaurant, opts) {
                 mixpanel.track('Checkout Started', filter(buildTracking(Guestful.track.eventOrigin, Guestful.track.language, {
                     event: event,
                     restaurant: restaurant,
-                    product: product
+                    product: product,
+                    guest: opts.guest || {}
                 })));
             },
 
